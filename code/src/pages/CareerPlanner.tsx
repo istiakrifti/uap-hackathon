@@ -315,7 +315,7 @@ const CareerPlanner: React.FC = () => {
               </Button>
             </div>
           ))}
-        </div>
+    </div>
       </div>
     </div>
   );

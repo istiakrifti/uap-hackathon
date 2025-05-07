@@ -4,11 +4,8 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import authRoutes from './routes/auth.routes';
 import userRoutes from './routes/user.routes';
-<<<<<<< HEAD
 import projectRoutes from './routes/project.routes';
-=======
 import jobRoutes from './routes/job.routes';
->>>>>>> 2c5e92d5e46935d9db74f5bd98fe008bef3abb55
 
 // Load environment variables
 dotenv.config();
@@ -25,11 +22,8 @@ app.use(express.json());
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
-<<<<<<< HEAD
 app.use('/api/projects', projectRoutes);
-=======
 app.use('/api/jobs', jobRoutes);
->>>>>>> 2c5e92d5e46935d9db74f5bd98fe008bef3abb55
 
 // Health check route
 app.get('/api/health', (req, res) => {

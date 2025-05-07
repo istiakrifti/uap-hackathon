@@ -10,7 +10,7 @@ import Dashboard from "./pages/Dashboard";
 import Projects from "./pages/Projects";
 import Quizzes from "./pages/Quizzes";
 import CareerPlanner from "./pages/CareerPlanner";
-import UserProfile from "./components/profile/UserProfile";
+import Profile from "./pages/Profile";
 import IndustryProfile from "./components/profile/IndustryProfile";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
@@ -70,12 +70,8 @@ const ProfileRouter = () => {
     return <Navigate to="/login" replace />;
   }
   
-<<<<<<< HEAD
   // Always use the appropriate profile component regardless of role
   return user.role === 'industry' ? <IndustryProfile /> : <Profile />;
-=======
-  return user.role === 'industry' ? <IndustryProfile /> : <UserProfile />;
->>>>>>> 2c5e92d5e46935d9db74f5bd98fe008bef3abb55
 };
 
 // App with auth context

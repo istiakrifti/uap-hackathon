@@ -8,27 +8,23 @@ interface SidebarProps {
   open: boolean;
 }
 
-<<<<<<< HEAD
-=======
-const navItems = [
-  { name: 'Dashboard', icon: <LayoutDashboard className="h-5 w-5" />, path: '/' },
-  { name: 'Mini-Projects', icon: <FileText className="h-5 w-5" />, path: '/projects' },
-  { name: 'Quizzes', icon: <FileQuestion className="h-5 w-5" />, path: '/quizzes' },
-  { name: 'Career Planner', icon: <BookOpen className="h-5 w-5" />, path: '/career-planner' },
-  { name: 'Jobs', icon: <Briefcase className="h-5 w-5" />, path: '/jobs' },
-  { name: 'Profile', icon: <User className="h-5 w-5" />, path: '/profile' },
-];
-
->>>>>>> 2c5e92d5e46935d9db74f5bd98fe008bef3abb55
 const Sidebar: React.FC<SidebarProps> = ({ open }) => {
   const { user } = useAuth();
   
   // Create nav items based on user role
   const getNavItems = () => {
+    // const baseItems = [
+    //   { name: 'Dashboard', icon: <LayoutDashboard className="h-5 w-5" />, path: '/' },
+    //   { name: 'Mini-Projects', icon: <FileText className="h-5 w-5" />, path: '/projects' },
+    //   { name: 'Career Planner', icon: <BookOpen className="h-5 w-5" />, path: '/career-planner' },
+    //   { name: 'Profile', icon: <User className="h-5 w-5" />, path: '/profile' },
+    // ];
     const baseItems = [
       { name: 'Dashboard', icon: <LayoutDashboard className="h-5 w-5" />, path: '/' },
       { name: 'Mini-Projects', icon: <FileText className="h-5 w-5" />, path: '/projects' },
+      { name: 'Quizzes', icon: <FileQuestion className="h-5 w-5" />, path: '/quizzes' },
       { name: 'Career Planner', icon: <BookOpen className="h-5 w-5" />, path: '/career-planner' },
+      { name: 'Jobs', icon: <Briefcase className="h-5 w-5" />, path: '/jobs' },
       { name: 'Profile', icon: <User className="h-5 w-5" />, path: '/profile' },
     ];
     
