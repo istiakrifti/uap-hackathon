@@ -4,6 +4,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import authRoutes from './routes/auth.routes';
 import userRoutes from './routes/user.routes';
+import projectRoutes from './routes/project.routes';
 
 // Load environment variables
 dotenv.config();
@@ -20,10 +21,35 @@ app.use(express.json());
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/projects', projectRoutes);
 
 // Health check route
 app.get('/api/health', (req, res) => {
   res.status(200).json({ status: 'ok', message: 'Server is running' });
+});
+
+// Debug route (only for development)
+app.get('/api/debug/submission-count', async (req, res) => {
+  try {
+    const Submission = mongoose.model('Submission');
+    const Project = mongoose.model('Project');
+    
+    const submissionCount = await Submission.countDocuments();
+    const projectCount = await Project.countDocuments();
+    
+    res.status(200).json({
+      status: 'ok', 
+      submissionCount,
+      projectCount,
+      dbStatus: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
+    });
+  } catch (error) {
+    res.status(500).json({ 
+      status: 'error', 
+      message: error instanceof Error ? error.message : 'Unknown error',
+      dbStatus: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
+    });
+  }
 });
 
 // Connect to MongoDB and start server

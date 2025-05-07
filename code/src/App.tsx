@@ -16,6 +16,10 @@ import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import NotFound from "./pages/NotFound";
 import { Loader2 } from "lucide-react";
+import ProjectForm from "./pages/IndustryProfile/ProjectForm";
+import ProjectSubmissions from "./pages/IndustryProfile/ProjectSubmissions";
+import MiniProjects from "./pages/IndustryProfile/MiniProjects";
+import ProjectDetail from "./pages/ProjectDetail";
 
 const queryClient = new QueryClient();
 
@@ -38,6 +42,25 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
+// Role-based projects router
+const ProjectsRouter = () => {
+  const { user } = useAuth();
+  
+  // Add console logs to debug user role and routing
+  console.log('ProjectsRouter - User:', user);
+  
+  if (!user) {
+    console.log('ProjectsRouter - No user, redirecting to login');
+    return <Navigate to="/login" replace />;
+  }
+  
+  console.log('ProjectsRouter - User role:', user.role);
+  
+  // Only industry users see the custom MiniProjects component
+  // Regular users see the Projects component with projects to apply to
+  return user.role === 'industry' ? <MiniProjects /> : <Projects />;
+};
+
 // Role-based profile router
 const ProfileRouter = () => {
   const { user } = useAuth();
@@ -46,6 +69,7 @@ const ProfileRouter = () => {
     return <Navigate to="/login" replace />;
   }
   
+  // Always use the appropriate profile component regardless of role
   return user.role === 'industry' ? <IndustryProfile /> : <Profile />;
 };
 
@@ -68,10 +92,40 @@ const AppWithAuth = () => (
             </ProtectedRoute>
           }>
             <Route index element={<Dashboard />} />
-            <Route path="projects" element={<Projects />} />
+            <Route path="projects" element={<ProjectsRouter />} />
             <Route path="quizzes" element={<Quizzes />} />
             <Route path="career-planner" element={<CareerPlanner />} />
             <Route path="profile" element={<ProfileRouter />} />
+            
+            {/* Project detail page for job seekers */}
+            <Route path="projects/:projectId" element={
+              <ProtectedRoute>
+                <ProjectDetail />
+              </ProtectedRoute>
+            } />
+            
+            {/* Nested routes for project management - only accessible to industry users */}
+            <Route path="projects/create" element={
+              <ProtectedRoute>
+                <ProjectForm />
+              </ProtectedRoute>
+            } />
+            <Route path="projects/edit/:projectId" element={
+              <ProtectedRoute>
+                <ProjectForm />
+              </ProtectedRoute>
+            } />
+            <Route path="projects/submissions/:projectId" element={
+              <ProtectedRoute>
+                <ProjectSubmissions />
+              </ProtectedRoute>
+            } />
+            
+            {/* Redirect old URL structure to new structure */}
+            <Route path="profile/projects" element={<Navigate to="/projects" replace />} />
+            <Route path="profile/projects/create" element={<Navigate to="/projects/create" replace />} />
+            <Route path="profile/projects/edit/:projectId" element={<Navigate to="/projects" replace />} />
+            <Route path="profile/projects/submissions/:projectId" element={<Navigate to="/projects" replace />} />
           </Route>
           
           {/* 404 route */}

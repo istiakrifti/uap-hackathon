@@ -40,9 +40,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const checkAuth = async () => {
       const token = localStorage.getItem('platformConnectToken');
+      console.log('Token from localStorage:', token ? 'Token exists' : 'No token');
       
       if (token) {
         try {
+          console.log('Checking auth with backend...');
           const response = await fetch(`${API_URL}/auth/me`, {
             headers: {
               'Authorization': `Bearer ${token}`
@@ -51,9 +53,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           
           if (response.ok) {
             const data = await response.json();
+            console.log('Auth check successful, user data:', data.user);
             setUser(data.user);
             setIsAuthenticated(true);
           } else {
+            console.error('Auth check failed with status:', response.status);
             // Token invalid, remove it
             localStorage.removeItem('platformConnectToken');
           }
