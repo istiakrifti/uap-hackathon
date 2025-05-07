@@ -1,7 +1,6 @@
-
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { User, BookOpen, LayoutDashboard, FileText, FileQuestion } from 'lucide-react';
+import { User, BookOpen, LayoutDashboard, FileText, FileQuestion, Briefcase } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const navItems = [
@@ -9,6 +8,7 @@ const navItems = [
   { name: 'Projects', icon: <FileText className="h-5 w-5" />, path: '/projects' },
   { name: 'Quizzes', icon: <FileQuestion className="h-5 w-5" />, path: '/quizzes' },
   { name: 'Career', icon: <BookOpen className="h-5 w-5" />, path: '/career-planner' },
+  { name: 'Jobs', icon: <Briefcase className="h-5 w-5" />, path: '/jobs' },
   { name: 'Profile', icon: <User className="h-5 w-5" />, path: '/profile' },
 ];
 

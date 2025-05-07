@@ -1,64 +1,196 @@
-
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Brain, BookOpen, Award, TrendingUp, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 
+interface Skill {
+  name: string;
+  level: number;
+}
+
+interface RequiredSkill {
+  name: string;
+  current: number;
+  required: number;
+}
+
+interface Recommendation {
+  id: string;
+  careerPath: string;
+  match: number;
+  description: string;
+  currentSkills: RequiredSkill[];
+  learningPath: LearningPath[];
+}
+
+interface LearningPath {
+  title: string;
+  description: string;
+  priority: string;
+  estimatedTime: string;
+}
+
 const CareerPlanner: React.FC = () => {
-  const skills = [
-    { name: 'JavaScript', level: 80 },
-    { name: 'React', level: 75 },
-    { name: 'Node.js', level: 60 },
-    { name: 'HTML/CSS', level: 90 },
-    { name: 'SQL', level: 65 },
-    { name: 'Git', level: 70 },
-    { name: 'TypeScript', level: 55 },
-    { name: 'Testing', level: 40 },
-  ];
-  
-  const recommendations = [
-    {
-      id: '1',
-      role: 'Front-End Developer',
-      company: 'Tech Innovators Inc.',
-      match: 85,
-      description: 'Based on your strong React and JavaScript skills, you\'d be a great fit for this front-end role.',
-      requiredSkills: [
-        { name: 'JavaScript', current: 80, required: 70 },
-        { name: 'React', current: 75, required: 80 },
-        { name: 'HTML/CSS', current: 90, required: 75 },
-        { name: 'TypeScript', current: 55, required: 65 },
-      ],
-    },
-    {
-      id: '2',
-      role: 'Full-Stack Developer',
-      company: 'Growth Startup',
-      match: 70,
-      description: 'Your combination of front-end and back-end skills makes you a good candidate for this full-stack position.',
-      requiredSkills: [
-        { name: 'JavaScript', current: 80, required: 70 },
-        { name: 'React', current: 75, required: 70 },
-        { name: 'Node.js', current: 60, required: 75 },
-        { name: 'SQL', current: 65, required: 70 },
-      ],
-    },
-    {
-      id: '3',
-      role: 'React Developer',
-      company: 'Established Enterprise',
-      match: 80,
-      description: 'Your React expertise and front-end skills align well with this specialized React developer position.',
-      requiredSkills: [
-        { name: 'React', current: 75, required: 80 },
-        { name: 'JavaScript', current: 80, required: 75 },
-        { name: 'TypeScript', current: 55, required: 70 },
-        { name: 'Testing', current: 40, required: 60 },
-      ],
+  const [skills, setSkills] = useState<Skill[]>([
+    
+    { name: 'NodeJs', level: 80 },
+    { name: 'ReactJs', level: 85 },
+    { name: 'Oracle', level: 90 },
+    { name: 'ExpressJs', level: 90 },
+  ]);
+  const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const fetchCareerData = async () => {
+    try {
+      setIsLoading(true);
+      const API_KEY = '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';
+      
+      console.log('Current skills data:', JSON.stringify(skills, null, 2));
+      
+      const requestBody = {
+        model: "gpt-3.5-turbo",
+        messages: [
+          {
+            role: "system",
+            content: "You are a career advisor specializing in software development career paths. Analyze the provided skills and suggest career paths along with required learning paths to achieve those career goals. Focus on career progression and skill development rather than specific job listings."
+          },
+          {
+            role: "user",
+            content: `Based on these programming skills, suggest career paths and learning recommendations:
+            ${JSON.stringify(skills)}
+            
+            Return ONLY a JSON object with this exact structure:
+            {
+              "recommendations": [
+                {
+                  "id": "1",
+                  "careerPath": "string (e.g., Full Stack Developer, AI Engineer, etc.)",
+                  "match": number,
+                  "description": "string (explaining why this path matches their skills)",
+                  "currentSkills": [
+                    {
+                      "name": "string",
+                      "current": number,
+                      "required": number
+                    }
+                  ],
+                  "learningPath": [
+                    {
+                      "title": "string",
+                      "description": "string",
+                      "priority": "high|medium|low",
+                      "estimatedTime": "string (e.g., '2-3 months')"
+                    }
+                  ]
+                }
+              ]
+            }`
+          }
+        ],
+        temperature: 0.7
+      };
+
+      console.log('Sending request to OpenAI API:', requestBody);
+
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${API_KEY}`
+        },
+        body: JSON.stringify(requestBody)
+      });
+
+      console.log('Response status:', response.status);
+      const responseText = await response.text();
+      console.log('Raw response:', responseText);
+
+      if (!response.ok) {
+        throw new Error(`API Error: ${response.status} ${responseText}`);
+      }
+
+      const data = JSON.parse(responseText);
+      console.log('Parsed API Response:', data);
+
+      if (!data.choices?.[0]?.message?.content) {
+        throw new Error('Invalid response format from API');
+      }
+
+      try {
+        const parsedData = JSON.parse(data.choices[0].message.content);
+        console.log('Parsed Recommendations:', parsedData);
+
+        if (!parsedData.recommendations) {
+          throw new Error('Invalid recommendations data structure');
+        }
+
+        setRecommendations(parsedData.recommendations);
+      } catch (parseError) {
+        console.error('Error parsing API response:', parseError);
+        throw new Error('Failed to parse API response as JSON');
+      }
+    } catch (error) {
+      console.error('Detailed error:', error);
+      // Fallback to dummy data in case of error
+      setRecommendations([
+        {
+          id: '1',
+          careerPath: 'AI/ML Engineer',
+          match: 90,
+          description: 'Your strong foundation in AI, ML, and Deep Learning makes you well-suited for an AI/ML Engineer career path.',
+          currentSkills: [
+            { name: 'AI', current: 80, required: 75 },
+            { name: 'ML', current: 85, required: 80 },
+            { name: 'Deep Learning', current: 90, required: 85 },
+            { name: 'Algorithm', current: 90, required: 80 },
+          ],
+          learningPath: [
+            {
+              title: 'Advanced Deep Learning',
+              description: 'Master advanced neural network architectures and training techniques',
+              priority: 'high',
+              estimatedTime: '3-4 months'
+            },
+            {
+              title: 'MLOps',
+              description: 'Learn to deploy and maintain ML models in production',
+              priority: 'medium',
+              estimatedTime: '2-3 months'
+            },
+            {
+              title: 'Research Methods',
+              description: 'Develop skills in ML research and paper implementation',
+              priority: 'medium',
+              estimatedTime: '3-4 months'
+            }
+          ]
+        }
+      ]);
+    } finally {
+      setIsLoading(false);
     }
-  ];
+  };
+
+  // Call fetchCareerData when skills change
+  useEffect(() => {
+    if (skills.length > 0) {
+      fetchCareerData();
+    }
+  }, [skills]);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-platformBlue mx-auto"></div>
+          <p className="mt-4 text-muted-foreground">Loading career recommendations...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
@@ -99,11 +231,11 @@ const CareerPlanner: React.FC = () => {
         </div>
       </div>
       
-      {/* AI Recommendations */}
+      {/* Career Path Recommendations */}
       <div>
         <div className="flex items-center gap-2 mb-6">
           <Award className="h-5 w-5 text-platformBlue" />
-          <h2 className="text-lg font-semibold">AI Career Recommendations</h2>
+          <h2 className="text-lg font-semibold">Career Path Recommendations</h2>
         </div>
         
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -112,8 +244,8 @@ const CareerPlanner: React.FC = () => {
               <CardHeader className="pb-2">
                 <div className="flex justify-between items-start">
                   <div>
-                    <CardTitle className="text-lg">{recommendation.role}</CardTitle>
-                    <CardDescription>{recommendation.company}</CardDescription>
+                    <CardTitle className="text-lg">{recommendation.careerPath}</CardTitle>
+                    <CardDescription>{recommendation.description}</CardDescription>
                   </div>
                   <Badge className="bg-platformBlue text-white">
                     {recommendation.match}% Match
@@ -122,11 +254,9 @@ const CareerPlanner: React.FC = () => {
               </CardHeader>
               
               <CardContent className="pb-4">
-                <p className="text-sm text-muted-foreground mb-4">{recommendation.description}</p>
-                
                 <h4 className="text-sm font-medium mb-3">Skill Comparison</h4>
                 <div className="space-y-2.5">
-                  {recommendation.requiredSkills.map((skill) => (
+                  {recommendation.currentSkills.map((skill) => (
                     <div key={skill.name} className="space-y-1">
                       <div className="flex items-center justify-between text-xs">
                         <span>{skill.name}</span>
@@ -149,15 +279,6 @@ const CareerPlanner: React.FC = () => {
                   ))}
                 </div>
               </CardContent>
-              
-              <CardFooter>
-                <Button variant="outline" className="w-full">
-                  <span className="flex items-center">
-                    Add to Learning Path
-                    <ChevronRight className="ml-1 h-4 w-4" />
-                  </span>
-                </Button>
-              </CardFooter>
             </Card>
           ))}
         </div>
@@ -167,54 +288,33 @@ const CareerPlanner: React.FC = () => {
       <div className="card">
         <div className="flex items-center gap-2 mb-4">
           <BookOpen className="h-5 w-5 text-platformBlue" />
-          <h2 className="text-lg font-semibold">Recommended Learning</h2>
+          <h2 className="text-lg font-semibold">Recommended Learning Path</h2>
         </div>
         
         <div className="space-y-4">
-          <div className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-md bg-purple-100 text-purple-600 flex items-center justify-center">
-                <TrendingUp className="h-5 w-5" />
+          {recommendations[0]?.learningPath.map((learning) => (
+            <div key={learning.title} className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
+              <div className="flex items-center gap-3">
+                <div className={`w-10 h-10 rounded-md flex items-center justify-center ${
+                  learning.priority === 'high' ? 'bg-red-100 text-red-600' :
+                  learning.priority === 'medium' ? 'bg-yellow-100 text-yellow-600' :
+                  'bg-green-100 text-green-600'
+                }`}>
+                  <TrendingUp className="h-5 w-5" />
+                </div>
+                <div>
+                  <h3 className="font-medium">{learning.title}</h3>
+                  <p className="text-xs text-muted-foreground">{learning.description}</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Priority: {learning.priority} • Time: {learning.estimatedTime}
+                  </p>
+                </div>
               </div>
-              <div>
-                <h3 className="font-medium">TypeScript Fundamentals</h3>
-                <p className="text-xs text-muted-foreground">Improve your TypeScript skills to enhance job prospects</p>
-              </div>
+              <Button variant="ghost" size="icon">
+                <ChevronRight className="h-5 w-5" />
+              </Button>
             </div>
-            <Button variant="ghost" size="icon">
-              <ChevronRight className="h-5 w-5" />
-            </Button>
-          </div>
-          
-          <div className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-md bg-blue-100 text-blue-600 flex items-center justify-center">
-                <TrendingUp className="h-5 w-5" />
-              </div>
-              <div>
-                <h3 className="font-medium">React Testing Library</h3>
-                <p className="text-xs text-muted-foreground">Learn how to write effective tests for React components</p>
-              </div>
-            </div>
-            <Button variant="ghost" size="icon">
-              <ChevronRight className="h-5 w-5" />
-            </Button>
-          </div>
-          
-          <div className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-md bg-green-100 text-green-600 flex items-center justify-center">
-                <TrendingUp className="h-5 w-5" />
-              </div>
-              <div>
-                <h3 className="font-medium">Node.js Advanced Concepts</h3>
-                <p className="text-xs text-muted-foreground">Strengthen your back-end skills with advanced Node.js</p>
-              </div>
-            </div>
-            <Button variant="ghost" size="icon">
-              <ChevronRight className="h-5 w-5" />
-            </Button>
-          </div>
+          ))}
         </div>
       </div>
     </div>
