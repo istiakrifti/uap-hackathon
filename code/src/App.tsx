@@ -5,12 +5,14 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import { ProfileProvider } from "./contexts/ProfileContext";
 import AppLayout from "./components/layout/AppLayout";
 import Dashboard from "./pages/Dashboard";
 import Projects from "./pages/Projects";
 import Quizzes from "./pages/Quizzes";
 import CareerPlanner from "./pages/CareerPlanner";
 import Profile from "./pages/Profile";
+import ProfileSettings from "./pages/ProfileSettings";
 import IndustryProfile from "./components/profile/IndustryProfile";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
@@ -81,58 +83,61 @@ const AppWithAuth = () => (
       <Toaster />
       <Sonner />
       <AuthProvider>
-        <Routes>
-          {/* Auth routes */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          
-          {/* Protected routes */}
-          <Route path="/" element={
-            <ProtectedRoute>
-              <AppLayout />
-            </ProtectedRoute>
-          }>
-            <Route index element={<Dashboard />} />
-            <Route path="projects" element={<ProjectsRouter />} />
-            <Route path="quizzes" element={<Quizzes />} />
-            <Route path="career-planner" element={<CareerPlanner />} />
-            <Route path="jobs" element={<Jobs />} />
-            <Route path="profile" element={<ProfileRouter />} />
+        <ProfileProvider>
+          <Routes>
+            {/* Auth routes */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
             
-            {/* Project detail page for job seekers */}
-            <Route path="projects/:projectId" element={
+            {/* Protected routes */}
+            <Route path="/" element={
               <ProtectedRoute>
-                <ProjectDetail />
+                <AppLayout />
               </ProtectedRoute>
-            } />
+            }>
+              <Route index element={<Dashboard />} />
+              <Route path="projects" element={<ProjectsRouter />} />
+              <Route path="quizzes" element={<Quizzes />} />
+              <Route path="career-planner" element={<CareerPlanner />} />
+              <Route path="jobs" element={<Jobs />} />
+              <Route path="profile" element={<ProfileRouter />} />
+              <Route path="profile/settings" element={<ProfileSettings />} />
+              
+              {/* Project detail page for job seekers */}
+              <Route path="projects/:projectId" element={
+                <ProtectedRoute>
+                  <ProjectDetail />
+                </ProtectedRoute>
+              } />
+              
+              {/* Nested routes for project management - only accessible to industry users */}
+              <Route path="projects/create" element={
+                <ProtectedRoute>
+                  <ProjectForm />
+                </ProtectedRoute>
+              } />
+              <Route path="projects/edit/:projectId" element={
+                <ProtectedRoute>
+                  <ProjectForm />
+                </ProtectedRoute>
+              } />
+              <Route path="projects/submissions/:projectId" element={
+                <ProtectedRoute>
+                  <ProjectSubmissions />
+                </ProtectedRoute>
+              } />
+              
+              {/* Redirect old URL structure to new structure */}
+              <Route path="profile/projects" element={<Navigate to="/projects" replace />} />
+              <Route path="profile/projects/create" element={<Navigate to="/projects/create" replace />} />
+              <Route path="profile/projects/edit/:projectId" element={<Navigate to="/projects" replace />} />
+              <Route path="profile/projects/submissions/:projectId" element={<Navigate to="/projects" replace />} />
+            </Route>
             
-            {/* Nested routes for project management - only accessible to industry users */}
-            <Route path="projects/create" element={
-              <ProtectedRoute>
-                <ProjectForm />
-              </ProtectedRoute>
-            } />
-            <Route path="projects/edit/:projectId" element={
-              <ProtectedRoute>
-                <ProjectForm />
-              </ProtectedRoute>
-            } />
-            <Route path="projects/submissions/:projectId" element={
-              <ProtectedRoute>
-                <ProjectSubmissions />
-              </ProtectedRoute>
-            } />
-            
-            {/* Redirect old URL structure to new structure */}
-            <Route path="profile/projects" element={<Navigate to="/projects" replace />} />
-            <Route path="profile/projects/create" element={<Navigate to="/projects/create" replace />} />
-            <Route path="profile/projects/edit/:projectId" element={<Navigate to="/projects" replace />} />
-            <Route path="profile/projects/submissions/:projectId" element={<Navigate to="/projects" replace />} />
-          </Route>
-          
-          {/* 404 route */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+            {/* 404 route */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </ProfileProvider>
       </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>

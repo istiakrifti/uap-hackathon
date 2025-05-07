@@ -315,7 +315,7 @@ const Profile: React.FC = () => {
               </div>
             </CardContent>
             <CardFooter>
-              <Button className="w-full">Edit Profile</Button>
+              <Button className="w-full" onClick={() => navigate('/profile/settings')}>Edit Profile</Button>
             </CardFooter>
           </Card>
         </div>

@@ -1,18 +1,35 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { User, BookOpen, LayoutDashboard, FileText, FileQuestion, Briefcase } from 'lucide-react';
+import { User, BookOpen, LayoutDashboard, FileText, Briefcase } from 'lucide-react';
 import { cn } from '@/lib/utils';
-
-const navItems = [
-  { name: 'Dashboard', icon: <LayoutDashboard className="h-5 w-5" />, path: '/' },
-  { name: 'Projects', icon: <FileText className="h-5 w-5" />, path: '/projects' },
-  { name: 'Quizzes', icon: <FileQuestion className="h-5 w-5" />, path: '/quizzes' },
-  { name: 'Career', icon: <BookOpen className="h-5 w-5" />, path: '/career-planner' },
-  { name: 'Jobs', icon: <Briefcase className="h-5 w-5" />, path: '/jobs' },
-  { name: 'Profile', icon: <User className="h-5 w-5" />, path: '/profile' },
-];
+import { useAuth } from '@/contexts/AuthContext';
 
 const MobileNavigation: React.FC = () => {
+  const { user } = useAuth();
+  
+  // Create nav items based on user role
+  const getNavItems = () => {
+    const baseItems = [
+      { name: 'Dashboard', icon: <LayoutDashboard className="h-5 w-5" />, path: '/' },
+      { name: 'Projects', icon: <FileText className="h-5 w-5" />, path: '/projects' },
+      { name: 'Jobs', icon: <Briefcase className="h-5 w-5" />, path: '/jobs' },
+      { name: 'Profile', icon: <User className="h-5 w-5" />, path: '/profile' },
+    ];
+    
+    // Only show Career Planner for job seekers, not for industry users
+    if (user?.role !== 'industry') {
+      baseItems.splice(2, 0, { 
+        name: 'Career', 
+        icon: <BookOpen className="h-5 w-5" />, 
+        path: '/career-planner' 
+      });
+    }
+    
+    return baseItems;
+  };
+  
+  const navItems = getNavItems();
+
   return (
     <div className="fixed bottom-0 left-0 right-0 z-20 bg-white border-t border-border lg:hidden">
       <nav className="flex justify-around">
