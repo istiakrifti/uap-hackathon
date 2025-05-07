@@ -1,0 +1,94 @@
+# Dependencies
+node_modules/
+/node_modules/
+/.pnp
+.pnp.js
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+bun.lockb
+
+# Build directories
+/dist
+/build
+/out
+/.next
+/.nuxt
+/dist-ssr
+*.local
+
+# Environment variables and secrets
+.env
+.env.*
+.env.local
+.env.development
+.env.development.local
+.env.test
+.env.test.local
+.env.production
+.env.production.local
+/backend/.env
+/backend/.env.*
+*.pem
+*.key
+*.cert
+
+# Database files/credentials
+mongodb-*.js
+*mongodb*.json
+*connection*.json
+
+# Testing
+/coverage
+/cypress/videos
+/cypress/screenshots
+.nyc_output
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Editor directories and files
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.swp
+*.swo
+.project
+.classpath
+.settings/
+*~
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Misc
+.cache
+.parcel-cache
+.temp
+.tmp
+.history
+tmp/
+temp/
+
+# Project specific
+/backend/dist/
+/backend/node_modules/
+/backend/package-lock.json
+
+# GitHub specific
+.github/*.yml
+!.github/workflows/*.yml
